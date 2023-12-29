@@ -11,6 +11,7 @@ const Login = () => {
 
   const handleLogin = () => {
     if (username && password) {
+      navigation.navigate('TrangChu')
       // Bạn có thể thực hiện xác thực ở đây (gửi thông tin đăng nhập đến máy chủ, v.v.)
       alert(`Login với Tên người dùng: ${username} và Mật khẩu: ${password}`);
      // Điều hướng đúng
@@ -48,7 +49,7 @@ const Login = () => {
           <Text style={styles.forgotPasswordText}>Forgot Password</Text>
         </TouchableOpacity>
   
-        <TouchableOpacity style={styles.button}onPress={()=> navigation.navigate('TrangChu')} >
+        <TouchableOpacity style={styles.button}onPress={handleLogin} >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
   

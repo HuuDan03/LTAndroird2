@@ -11,7 +11,7 @@ import GioHang from './screens/home/GioHang';
 const Stack = createStackNavigator();
 export default function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer> 
       <Stack.Navigator initialRouteName="Login">
        
         <Stack.Screen name="Header" component={Header} />
@@ -21,6 +21,10 @@ export default function App() {
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
         <Stack.Screen name="GioHang" component={GioHang} />
         {/* Thêm các màn hình khác tại đây nếu cần */}
+        {/* dan khungf */}
+        {/* ssssssssssss */}
+        {/* screenssssssssssssssssss */}
+        {/* sssssssssssss */}
       </Stack.Navigator>
     </NavigationContainer>
   );
