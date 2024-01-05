@@ -2,6 +2,24 @@ import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
+const handleAddToCart = () => {
+  setCartItems((prevItems) => {
+    const existingItem = prevItems.find((cartItem) => cartItem.id === item.id);
+
+    if (existingItem) {
+      return prevItems.map((cartItem) =>
+        cartItem.id === item.id
+          ? { ...cartItem, quantity: cartItem.quantity + 1 }
+          : cartItem
+      );
+    } else {
+      return [...prevItems, { ...item, quantity: 1 }];
+    }
+  });
+
+  // Navigate to the Cart screen
+  navigation.navigate('GioHang', { cartItems: cartItems });
+};
 const Chitiet = ({ route }) => {
   const { item, cartItems, setCartItems } = route.params;
 
@@ -31,39 +49,69 @@ const Chitiet = ({ route }) => {
       >
         <Text style={styles.addToCartButtonText}>Add to Cart</Text>
       </TouchableOpacity>
-      <Text style={styles.cartItemsText}>Items in Cart: {cartItems.length}</Text>
-      {cartItems.map((cartItem) => (
-        <View key={cartItem.id}>
-          <Image source={cartItem.source} style={styles.cartItemImage} />
-          <Text>{cartItem.name}</Text>
-          <Text>Quantity: {cartItem.quantity}</Text>
-        </View>
-      ))}
+      <Text style={styles.cartItemsText}>
+  Items in Cart: {cartItems ? cartItems.length : 0}
+</Text>
+{cartItems &&
+  cartItems.map((cartItem) => (
+    <View key={cartItem.id}>
+      <Image source={cartItem.source} style={styles.cartItemImage} />
+      <Text>{cartItem.name}</Text>
+      <Text>Quantity: {cartItem.quantity}</Text>
+    </View>
+  ))}
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  chitiet: {
-    // Thêm kiểu dáng cho trang chi tiết
+  container: {
+    flex: 1,
+    alignItems: "center",
+    padding: 20,
   },
   image: {
-    // Thêm kiểu dáng cho hình ảnh sản phẩm
+    width: 200,
+    height: 200,
+    resizeMode: "cover",
+    marginBottom: 10,
   },
   itemText: {
-    // Thêm kiểu dáng cho thông tin sản phẩm
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   addToCartButton: {
-    // Thêm kiểu dáng cho nút "Add to Cart"
+    backgroundColor: "#3498db",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
   },
   addToCartButtonText: {
-    // Thêm kiểu dáng cho văn bản nút "Add to Cart"
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
   },
   cartItemsText: {
-    // Thêm kiểu dáng cho văn bản hiển thị số lượng sản phẩm trong giỏ hàng
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  cartItemContainer: {
+    marginBottom: 20,
   },
   cartItemImage: {
-    // Thêm kiểu dáng cho hình ảnh sản phẩm trong giỏ hàng
+    width: 50,
+    height: 50,
+    resizeMode: "cover",
+    marginBottom: 5,
+  },
+  cartItemName: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  cartItemQuantity: {
+    fontSize: 14,
   },
 });
 
