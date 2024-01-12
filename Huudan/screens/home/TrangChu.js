@@ -1,37 +1,62 @@
-import Header from '../home/Header.js';
-import Footer from '../home/Footer.js';
-import React, { useState } from 'react';
+import Header from './Header.js';
+import Footer from './Footer.js';
+import React, { useState,useEffect } from 'react';
 import { StyleSheet, View, Image, FlatList, Text, TouchableOpacity } from 'react-native';
-import GioHang from './GioHang.js';
+import Modal from 'react-native-modal';
+import SlideShow from './SlideShow.js';
+
+
 
 const anh = [
-  { id: '1', name: 'Áo thun 1', source: require('../../assets/images/T-shirt1.webp') },
-  { id: '2', name: 'Áo thun 2', source: require('../../assets/images/T-shirt4.webp') },
-  { id: '3', name: 'Áo thun 3', source: require('../../assets/images/T-shirt1.webp') },
-  { id: '4', name: 'Áo thun 4', source: require('../../assets/images/T-shirt3.webp') },
-  { id: '5', name: 'Áo thun 5', source: require('../../assets/images/T-shirt3.webp') },
-  { id: '6', name: 'Áo thun 6', source: require('../../assets/images/T-shirt3.webp') },
 ];
-
 export default function TrangChu({ navigation }) {
+  const [fashion, setFashion] = useState([]);
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+  const getAPI = () => {
+    return fetch(`https://659fac0d5023b02bfe8a2647.mockapi.io/db_android`)
+      .then((response) => response.json())
+      .then((data) => setFashion(data))
+      .catch((error) => console.error(error));
+  };
+
+  useEffect(() => {
+    getAPI();
+  }, []);
+
   const renderItem = ({ item }) => (
+    
     <TouchableOpacity
-      onPress={() => navigation.navigate('Chitiet', { item })}
+    onPress={() => navigation.navigate('Chitiet', { item,cartItems, setCartItems, })}
       style={styles.itemContainer}
     >
-      <Image source={item.source} style={styles.image} />
+      <Image source={{ uri: item.image }} style={styles.image} />
       <Text style={styles.itemText}>{item.name}</Text>
+      <Text style={styles.itemTextPrice}>{item.price}$</Text>
       <TouchableOpacity
         style={styles.addToCartButton}
         onPress={() => handleAddToCart(item)}
       >
         <Text style={styles.addToCartButtonText}>Add to Cart</Text>
       </TouchableOpacity>
+      <Modal isVisible={isModalVisible}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>Sản phẩm đã được thêm vào giỏ hàng</Text>
+          <TouchableOpacity onPress={toggleModal}>
+            <Text style={styles.closeModalText}>Đóng</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </TouchableOpacity>
   );
+
   const [cartItems, setCartItems] = useState([]);
 
   const handleAddToCart = (item) => {
+
     const existingItem = cartItems.find((cartItem) => cartItem.id === item.id);
 
     if (existingItem) {
@@ -42,40 +67,49 @@ export default function TrangChu({ navigation }) {
             : cartItem
         )
       );
+       // Hiển thị thông báo thành công
+    
     } else {
       setCartItems((prevItems) => [...prevItems, { ...item, quantity: 1 }]);
+      // Hiển thị thông báo thành công
+   
     }
+    toggleModal();
   };
+
   const handlePressCart = () => {
-    // Chuyển đến trang giỏ hàng khi nhấn vào giỏ hàng
-    navigation.navigate('GioHang', { cartItems });
+    navigation.navigate('GioHang', { cartItems, setCartItems });
   };
-  <GioHang route={{ params: { cartItems, setCartItems } }} />
 
   return (
     <View style={styles.trangchu}>
-       <Header onPressCart={handlePressCart} onSearch={(searchText) => console.log(searchText)} />
- 
+    
+      <Header onPressCart={handlePressCart} onSearch={(searchText) => console.log(searchText)} />
+      {/* <SlideShow/> */}
       <Image
         style={styles.banner}
-        source={require('../../assets/images/banne.webp')}
+        source={require('../../assets/images/banner.jpg')}
       />
-      <Text style={styles.title}>Sản phẩm</Text>
+ 
+      <Text style={styles.title}>Sản phẩm
+      </Text>
+ 
       <FlatList
-        data={anh}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        data={fashion}
         numColumns={2}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        scrollEnabled={true}  // Cho phép cuộn
       />
-      <Footer></Footer>
+        {/* <Footer/> */}
+   
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   trangchu: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     margin: 10,
   },
   title: {
@@ -101,6 +135,33 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 16,
     color: 'black',
+    textAlign: 'center',
+  },
+  addToCartButtonText:{
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderWidth: 1,
+    marginRight: 5,
+    backgroundColor: "pink",
+    borderColor: "pink",
+  },
+  itemTextPrice:{
+    color: 'green',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  closeModalText: {
+    color: '#3498db',
     textAlign: 'center',
   },
 });

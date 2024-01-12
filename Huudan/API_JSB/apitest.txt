@@ -1,0 +1,12 @@
+{
+    "title": "aaaa",
+    "description": "bbbbb",
+    "photo": "phone.png",
+    "price": 9999,
+    "category":{
+        "id":1,
+        "title":"",
+        "description":"",
+        "photo":""
+    }
+}
