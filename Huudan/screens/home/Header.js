@@ -2,25 +2,17 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput,Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const Header = ({ onSearch,onPressCart  }) => {
-  const [searchText, setSearchText] = useState('');
+const Header = ({ onPressCart  }) => {
+  
 
-  const handleSearch = () => {
-    onSearch(searchText);
-  };
-
+ 
   return (
     <View style={styles.header}>
       <Image
         style={styles.logo}
         source={require('../../assets/images/logo/logo.png')}
       />
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search"
-        onChangeText={(text) => setSearchText(text)}
-        onBlur={handleSearch}
-      />
+     
        <TouchableOpacity onPress={onPressCart}>
         <Image
           style={styles.cartIcon}

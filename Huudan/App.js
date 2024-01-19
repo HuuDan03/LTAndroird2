@@ -10,9 +10,14 @@ import Chitiet from './screens/home/Chitiet';
 import GioHang from './screens/home/GioHang';
 import { ToastProvider } from 'react-native-toast-message';
 import ThanhToan from './screens/home/ThanhToan';
-// import SlideShow from './screens/home/SlideShow';
+
 import SignUp from './screens/login/SignUp';
 import Footer from './screens/home/Footer';
+import CategoryList from './screens/home/CategoryList';
+import NewPassword from './screens/login/NewPassword';
+import ResetPasswordConfirmation from './screens/login/ResetPasswordConfirmation';
+import Welcome from './screens/login/Welcome';
+import ThongBao from './screens/home/ThongBao';
 
 
 
@@ -22,28 +27,42 @@ export default function App() {
   
     <NavigationContainer> 
             {/* <ToastProvider> */}
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Welcome">
        
+      <Stack.Screen name="Welcome" component={Welcome} 
+        options={{ headerShown: false }}/>
+
         <Stack.Screen name="Header" component={Header} 
         options={{ headerShown: false }}/>
+    <Stack.Screen name="CategoryList" component={CategoryList} options={{ headerShown: false }} 
+       />
     
         <Stack.Screen name="Login" component={Login}
          options={{ headerShown: false }}/>
         <Stack.Screen name="TrangChu" component={TrangChu} 
         options={{ headerShown: false }}/>
-         {/* <Stack.Screen name="Slide" component={SlideShow} 
-        options={{ headerShown: false }}/> */}
+      
         <Stack.Screen name="Chitiet" component={Chitiet}
         options={{ headerShown: false }} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} 
+         options={{ headerShown: false }}/>
         <Stack.Screen name="SignUp" component={SignUp}
          options={{ headerShown: false }} />
-        <Stack.Screen name="Footer" component={Footer}xx/>
+                 <Stack.Screen name="NewPassword" component={NewPassword} 
+        options={{ headerShown: false }} />
+                         <Stack.Screen name="ResetPasswordConfirmation" component={ResetPasswordConfirmation} 
+        options={{ headerShown: false }} />
+
+
+        <Stack.Screen name="Footer" component={Footer}/>
 
         <Stack.Screen name="GioHang" component={GioHang}
         options={{ headerShown: false }} />
         <Stack.Screen name="ThanhToan" component={ThanhToan}
         options={{ headerShown: false }} />
+                <Stack.Screen name="ThongBao" component={ThongBao}
+        options={{ headerShown: false }} />
+
         {/* Thêm các màn hình khác tại đây nếu cần */}
         {/* dan khungf */}
         {/* ssssssssssss */}

@@ -1,25 +1,31 @@
-import Header from './Header.js';
-import Footer from './Footer.js';
-import React, { useState,useEffect } from 'react';
-import { StyleSheet, View, Image, FlatList, Text, TouchableOpacity } from 'react-native';
+
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Image, FlatList, Text, TouchableOpacity, TextInput } from 'react-native';
 import Modal from 'react-native-modal';
-import SlideShow from './SlideShow.js';
+import Header from './Header';
+import Footer from './Footer';
+import CategoryList from './CategoryList';
 
 
-
-const anh = [
-];
 export default function TrangChu({ navigation }) {
   const [fashion, setFashion] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [displayedFashion, setDisplayedFashion] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('Tất cả');
+  const [cartItems, setCartItems] = useState([]);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
+
   const getAPI = () => {
     return fetch(`https://659fac0d5023b02bfe8a2647.mockapi.io/db_android`)
       .then((response) => response.json())
-      .then((data) => setFashion(data))
+      .then((data) => {
+        setFashion(data);
+        setDisplayedFashion(data);
+      })
       .catch((error) => console.error(error));
   };
 
@@ -27,10 +33,24 @@ export default function TrangChu({ navigation }) {
     getAPI();
   }, []);
 
+  const getCategory = (data) => {
+    const allCategories = data.map(item => item.cat);
+    return ['Tất cả', ...new Set(allCategories)];
+  };
+
+  const handleSelectCategory = (category) => {
+    setSelectedCategory(category);
+    if (category === 'Tất cả') {
+      setDisplayedFashion(fashion);
+    } else {
+      const filteredFashion = fashion.filter(item => item.cat === category);
+      setDisplayedFashion(filteredFashion);
+    }
+  };
+
   const renderItem = ({ item }) => (
-    
     <TouchableOpacity
-    onPress={() => navigation.navigate('Chitiet', { item,cartItems, setCartItems, })}
+      onPress={() => navigation.navigate('Chitiet', { item, cartItems, setCartItems })}
       style={styles.itemContainer}
     >
       <Image source={{ uri: item.image }} style={styles.image} />
@@ -40,7 +60,7 @@ export default function TrangChu({ navigation }) {
         style={styles.addToCartButton}
         onPress={() => handleAddToCart(item)}
       >
-        <Text style={styles.addToCartButtonText}>Add to Cart</Text>
+        <Text style={styles.addToCartButtonText}>{item.id === 'no_result' ? 'Không phù hợp' : 'Add to Cart'}</Text>
       </TouchableOpacity>
       <Modal isVisible={isModalVisible}>
         <View style={styles.modalContent}>
@@ -53,9 +73,11 @@ export default function TrangChu({ navigation }) {
     </TouchableOpacity>
   );
 
-  const [cartItems, setCartItems] = useState([]);
-
   const handleAddToCart = (item) => {
+    if (item.id === 'no_result') {
+      alert('Sản phẩm không phù hợp');
+      return;
+    }
 
     const existingItem = cartItems.find((cartItem) => cartItem.id === item.id);
 
@@ -67,12 +89,8 @@ export default function TrangChu({ navigation }) {
             : cartItem
         )
       );
-       // Hiển thị thông báo thành công
-    
     } else {
       setCartItems((prevItems) => [...prevItems, { ...item, quantity: 1 }]);
-      // Hiển thị thông báo thành công
-   
     }
     toggleModal();
   };
@@ -81,31 +99,49 @@ export default function TrangChu({ navigation }) {
     navigation.navigate('GioHang', { cartItems, setCartItems });
   };
 
+  const handleSearch = () => {
+    const filteredFashion = fashion.filter(item =>
+      item.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    if (filteredFashion.length > 0) {
+      setDisplayedFashion(filteredFashion);
+    } else {
+      setDisplayedFashion([{ id: 'no_result', name: 'Không có sản phẩm này' }]);
+    }
+  };
+
   return (
-    <View style={styles.trangchu}>
     
-      <Header onPressCart={handlePressCart} onSearch={(searchText) => console.log(searchText)} />
-      {/* <SlideShow/> */}
+    <View style={styles.trangchu}>
+       
+      <Header onPressCart={handlePressCart} onSearch={(searchText) => handleSearch(searchText)} />
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Tìm kiếm sản phẩm"
+        onChangeText={(text) => setSearchText(text)}
+        onBlur={handleSearch}
+      />
+      <CategoryList categories={getCategory(fashion)} onSelectCategory={handleSelectCategory} />
       <Image
         style={styles.banner}
         source={require('../../assets/images/banner.jpg')}
       />
- 
-      <Text style={styles.title}>Sản phẩm
-      </Text>
- 
+
+      <Text style={styles.title}>Sản phẩm</Text>
       <FlatList
-        data={fashion}
+        data={displayedFashion}
         numColumns={2}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        scrollEnabled={true}  // Cho phép cuộn
+        scrollEnabled={true}
       />
-        {/* <Footer/> */}
-   
+            <Footer navigation={navigation}  />
+
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   trangchu: {
     flex: 1,
@@ -115,12 +151,10 @@ const styles = StyleSheet.create({
   title: {
     color: 'black',
     fontSize: 20,
- 
   },
   banner: {
     width: 380,
     height: 200,
-  
   },
   itemContainer: {
     flex: 1,
@@ -134,18 +168,19 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
-    color: 'black',
+    color: '#505050',
     textAlign: 'center',
   },
-  addToCartButtonText:{
+  addToCartButtonText: {
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderWidth: 1,
     marginRight: 5,
-    backgroundColor: "pink",
-    borderColor: "pink",
+    color:"#505050",
+    backgroundColor: 'pink',
+    borderColor: 'pink',
   },
-  itemTextPrice:{
+  itemTextPrice: {
     color: 'green',
   },
   modalContent: {
@@ -163,5 +198,13 @@ const styles = StyleSheet.create({
   closeModalText: {
     color: '#3498db',
     textAlign: 'center',
+  },
+  searchInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingLeft: 10,
+    margin: 10,
+    borderRadius: 15,
   },
 });

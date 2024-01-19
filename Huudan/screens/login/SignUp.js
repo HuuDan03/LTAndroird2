@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image,ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -9,38 +8,56 @@ const SignUp = () => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
 
   const handleSignUp = async () => {
-    if (username && password) {
-      // Lưu thông tin người dùng đã đăng ký vào AsyncStorage
-      await AsyncStorage.setItem('username', username);
-      await AsyncStorage.setItem('password', password);
+    if (username && password && email) {
+      try {
+        // Lấy danh sách tài khoản đã đăng ký từ AsyncStorage
+        const existingAccountsString = await AsyncStorage.getItem('accounts');
+        const existingAccounts = existingAccountsString ? JSON.parse(existingAccountsString) : [];
 
-      // Thực hiện đăng nhập tự động
-      handleLogin();
+        // Kiểm tra xem tài khoản có tồn tại chưa
+        const isAccountExist = existingAccounts.some(
+          (account) => account.username === username || account.email === email
+        );
+
+        if (!isAccountExist) {
+          // Thêm tài khoản mới vào danh sách
+          const newAccount = { username, password, email };
+          existingAccounts.push(newAccount);
+
+          // Lưu lại danh sách tài khoản vào AsyncStorage
+          await AsyncStorage.setItem('accounts', JSON.stringify(existingAccounts));
+
+          // Thực hiện đăng nhập tự động
+          handleLogin();
+        } else {
+          alert('Tài khoản đã tồn tại. Vui lòng chọn tên người dùng hoặc email khác.');
+        }
+      } catch (error) {
+        console.error('Lỗi khi đăng ký:', error);
+        alert('Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.');
+      }
     } else {
-      alert('Vui lòng nhập cả tên người dùng và mật khẩu.');
+      alert('Vui lòng nhập cả tên người dùng, email và mật khẩu.');
     }
   };
 
   const handleLogin = async () => {
-    const storedUsername = await AsyncStorage.getItem('username');
-    const storedPassword = await AsyncStorage.getItem('password');
+    // Thực hiện logic đăng nhập
+    alert('Dang ky thanh cong.');
 
-    if (storedUsername && storedPassword) {
-      // Thực hiện logic đăng nhập (ví dụ: kiểm tra thông tin với máy chủ)
-      alert(`Đăng ký với Tên người dùng: ${storedUsername} và Mật khẩu: ${storedPassword}`);
-      navigation.navigate('Login'); // Điều hướng
-    } else {
-      alert('Không thể đăng nhập tự động. Vui lòng đăng nhập bằng tên người dùng và mật khẩu.');
-    }
-  };
 
-  const handleLoginRedirect = () => {
+    // Chuyển hướng sau khi đăng nhập
     navigation.navigate('Login');
   };
 
   return (
+    <ImageBackground
+      source={require('../../assets/images/backgroundmain.jpg')} // Đường dẫn hình ảnh background của bạn
+      style={styles.backgroundImage}
+    >
     <View style={styles.home}>
       <Image
         style={styles.logo}
@@ -57,6 +74,13 @@ const SignUp = () => {
 
       <TextInput
         style={styles.input}
+        placeholder="Email"
+        onChangeText={(text) => setEmail(text)}
+        value={email}
+      />
+
+      <TextInput
+        style={styles.input}
         placeholder="Mật khẩu"
         onChangeText={(text) => setPassword(text)}
         value={password}
@@ -67,21 +91,23 @@ const SignUp = () => {
         <Text style={styles.buttonText}>Đăng ký</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button1} onPress={handleLoginRedirect}>
-        <Text style={styles.buttonText}>Quay lại Đăng nhập</Text>
+      <TouchableOpacity style={styles.button1} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Đăng nhập</Text>
       </TouchableOpacity>
-
-      <StatusBar style="auto" />
     </View>
+    </ImageBackground>
   );
 };
-
 const styles = StyleSheet.create({
   home: {
-    flex: 1,
-    backgroundColor: '#FFC0CB',
+    
     margin: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
     justifyContent: 'center',
   },
   logo: {

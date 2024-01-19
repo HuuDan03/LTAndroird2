@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button, Image } from 'react-native';
 import Modal from 'react-native-modal';
 
 const ThanhToan = ({ route, navigation }) => {
@@ -20,6 +20,7 @@ const ThanhToan = ({ route, navigation }) => {
 
     // Mở modal thông báo
     toggleModal();
+    navigation.navigate('ThongBao', { cartItems });
   };
 
   const calculateTotalQuantity = (cartItems) => {
@@ -34,6 +35,7 @@ const ThanhToan = ({ route, navigation }) => {
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Text style={styles.itemName}>{item.name}</Text>
+            <Image source={{ uri: item.image }} style={styles.itemImage} />
             <Text>Số lượng: {item.quantity}</Text>
             <Text>Giá: {item.price}$</Text>
             <Text>Size: {item.size}</Text>
@@ -97,6 +99,7 @@ const styles = StyleSheet.create({
   },
   summaryText: {
     fontSize: 16,
+    color: 'red',
     marginBottom: 5,
   },
   confirmButton: {
@@ -122,6 +125,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  itemImage: {
+    width: '100%', // Hiển thị hình ảnh với chiều rộng tối đa
+    height: 200, // Điều chỉnh kích thước theo nhu cầu của bạn
+    borderRadius: 8,
+    marginBottom: 5,
   },
 });
 

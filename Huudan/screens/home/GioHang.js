@@ -52,7 +52,7 @@ const GioHang = ({ route, navigation }) => {
   const handleQuantityDecrement = (itemId) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === itemId && item.quantity > 0 ? { ...item, quantity: item.quantity - 1 } : item
+        item.id === itemId && item.quantity > 1 ? { ...item, quantity: item.quantity -1 } : item
       )
     );
   };
@@ -75,7 +75,7 @@ const GioHang = ({ route, navigation }) => {
             <Image source={{ uri: item.image }} style={styles.itemImage} />
             <View style={styles.itemInfo}>
               <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemPrice}>{item.price}$</Text>
+              <Text style={styles.itemPrice}>Giá: {item.price}$</Text>
               <View style={styles.row}>
                 <Text style={styles.itemSize}>Size: {item.size}</Text>
                 {["S", "M", "L", "XL"].map((size) => (
@@ -95,7 +95,7 @@ const GioHang = ({ route, navigation }) => {
                 ))}
               </View>
               <View style={styles.row}>
-                <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
+                <Text style={styles.itemQuantity}>Số Lượng: {item.quantity}</Text>
                 <TouchableOpacity
                   onPress={() => handleQuantityDecrement(item.id)}
                   style={styles.quantityButton}
@@ -167,8 +167,11 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "#505050",
     marginBottom: 5,
+  },
+  itemPrice:{
+    color: "green",
   },
   row: {
     flexDirection: "row",
