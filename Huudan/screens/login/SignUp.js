@@ -52,7 +52,11 @@ const SignUp = () => {
     // Chuyển hướng sau khi đăng nhập
     navigation.navigate('Login');
   };
-
+  const isValidEmail = (email) => {
+    // Kiểm tra tính hợp lệ của email (Bạn có thể cải thiện hàm kiểm tra này theo nhu cầu)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
   return (
     <ImageBackground
       source={require('../../assets/images/backgroundmain.jpg')} // Đường dẫn hình ảnh background của bạn
@@ -76,7 +80,8 @@ const SignUp = () => {
         style={styles.input}
         placeholder="Email"
         onChangeText={(text) => setEmail(text)}
-        value={email}
+            value={email}
+            keyboardType="email-address"
       />
 
       <TextInput

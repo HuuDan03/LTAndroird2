@@ -1,35 +1,34 @@
+// ForgotPassword.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ForgotPassword = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleForgotPassword = async () => {
-    if (email) {
+    if (email && username && password) {
       try {
-        // Lấy danh sách tài khoản đã đăng ký từ AsyncStorage
         const existingAccountsString = await AsyncStorage.getItem('accounts');
         const existingAccounts = existingAccountsString ? JSON.parse(existingAccountsString) : [];
 
-        // Kiểm tra xem email có tồn tại trong danh sách tài khoản không
-        const isEmailExist = existingAccounts.some((account) => account.email === email);
+        const isCredentialsExist = existingAccounts.some(
+          (account) => account.email === email && account.username === username && account.password === password
+        );
 
-        if (isEmailExist) {
-          // Thực hiện logic gửi email đặt lại mật khẩu (ví dụ: gửi mã xác nhận)
-          // Ở đây, bạn có thể sử dụng thư viện gửi email hoặc gọi API đặt lại mật khẩu
-
-          // Chuyển hướng người dùng đến màn hình nhập mã xác nhận
+        if (isCredentialsExist) {
           navigation.navigate('ResetPasswordConfirmation', { email });
         } else {
-          alert('Email không tồn tại trong hệ thống.');
+          alert('Thông tin đăng nhập không chính xác.');
         }
       } catch (error) {
         console.error('Lỗi khi xử lý quên mật khẩu:', error);
         alert('Đã xảy ra lỗi khi xử lý quên mật khẩu. Vui lòng thử lại.');
       }
     } else {
-      alert('Vui lòng nhập địa chỉ email.');
+      alert('Vui lòng nhập đầy đủ thông tin: Email, Tên Đăng Nhập, Mật Khẩu.');
     }
   };
 
@@ -42,11 +41,24 @@ const ForgotPassword = ({ navigation }) => {
         onChangeText={(text) => setEmail(text)}
         value={email}
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Nhập Tên Đăng Nhập"
+        onChangeText={(text) => setUsername(text)}
+        value={username}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Nhập Mật Khẩu"
+        secureTextEntry={true}
+        onChangeText={(text) => setPassword(text)}
+        value={password}
+      />
       <TouchableOpacity style={styles.button} onPress={handleForgotPassword}>
         <Text style={styles.buttonText}>Gửi Yêu Cầu</Text>
       </TouchableOpacity>
     </View>
-  );                              
+  );
 };
 
 const styles = StyleSheet.create({

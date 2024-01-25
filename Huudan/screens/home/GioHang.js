@@ -147,10 +147,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
+    
   },
   cartItem: {
     flexDirection: "row",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#fff",
     padding: 10,
     marginBottom: 10,
     borderRadius: 8,
@@ -161,6 +162,7 @@ const styles = StyleSheet.create({
     height: 80,
     marginRight: 10,
     borderRadius: 8,
+    
   },
   itemInfo: {
     flex: 1,

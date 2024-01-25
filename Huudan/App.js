@@ -18,6 +18,10 @@ import NewPassword from './screens/login/NewPassword';
 import ResetPasswordConfirmation from './screens/login/ResetPasswordConfirmation';
 import Welcome from './screens/login/Welcome';
 import ThongBao from './screens/home/ThongBao';
+import ThongTinTaiKhoan from './screens/home/ThongTinTaiKhoan';
+import Favorite from './screens/home/Favorite';
+
+
 
 
 
@@ -62,6 +66,14 @@ export default function App() {
         options={{ headerShown: false }} />
                 <Stack.Screen name="ThongBao" component={ThongBao}
         options={{ headerShown: false }} />
+                        <Stack.Screen name="ThongTinTaiKhoan" component={ThongTinTaiKhoan}
+        options={{ headerShown: false }} />
+                                <Stack.Screen name="Favorite" component={Favorite}
+        options={{ headerShown: false }} />
+
+
+
+
 
         {/* Thêm các màn hình khác tại đây nếu cần */}
         {/* dan khungf */}

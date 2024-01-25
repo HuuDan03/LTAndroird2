@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,20 +5,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const NewPassword = ({ route, navigation }) => {
   const { email } = route.params;
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
 
   const handleResetPassword = async () => {
-    if (password) {
+    if (password && confirmPassword && password === confirmPassword) {
       try {
-        // Lấy danh sách tài khoản đã đăng ký từ AsyncStorage
         const existingAccountsString = await AsyncStorage.getItem('accounts');
         const existingAccounts = existingAccountsString ? JSON.parse(existingAccountsString) : [];
 
-        // Cập nhật mật khẩu mới trong danh sách tài khoản
         const updatedAccounts = existingAccounts.map((account) =>
           account.email === email ? { ...account, password } : account
         );
 
-        // Lưu lại danh sách tài khoản đã cập nhật vào AsyncStorage
         await AsyncStorage.setItem('accounts', JSON.stringify(updatedAccounts));
 
         alert('Đặt lại mật khẩu thành công. Đăng nhập với mật khẩu mới.');
@@ -29,7 +27,8 @@ const NewPassword = ({ route, navigation }) => {
         alert('Đã xảy ra lỗi khi đặt lại mật khẩu mới. Vui lòng thử lại.');
       }
     } else {
-      alert('Vui lòng nhập mật khẩu mới.');
+      // Kiểm tra nếu mật khẩu và xác nhận mật khẩu không giống nhau
+      setPasswordsMatch(false);
     }
   };
 
@@ -43,6 +42,16 @@ const NewPassword = ({ route, navigation }) => {
         value={password}
         secureTextEntry={true}
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Xác Nhận Mật Khẩu"
+        onChangeText={(text) => setConfirmPassword(text)}
+        value={confirmPassword}
+        secureTextEntry={true}
+      />
+      {!passwordsMatch && (
+        <Text style={styles.errorText}>Mật khẩu và xác nhận mật khẩu phải giống nhau.</Text>
+      )}
       <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
         <Text style={styles.buttonText}>Xác Nhận</Text>
       </TouchableOpacity>
@@ -81,6 +90,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginBottom: 10,
   },
 });
 

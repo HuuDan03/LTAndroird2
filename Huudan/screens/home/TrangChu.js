@@ -1,22 +1,26 @@
-
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, FlatList, Text, TouchableOpacity, TextInput } from 'react-native';
 import Modal from 'react-native-modal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import Footer from './Footer';
 import CategoryList from './CategoryList';
 
-
 export default function TrangChu({ navigation }) {
   const [fashion, setFashion] = useState([]);
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isCartModalVisible, setCartModalVisible] = useState(false);
+  const [isFavoriteModalVisible, setFavoriteModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [displayedFashion, setDisplayedFashion] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [cartItems, setCartItems] = useState([]);
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+  const toggleCartModal = () => {
+    setCartModalVisible(!isCartModalVisible);
+  };
+
+  const toggleFavoriteModal = () => {
+    setFavoriteModalVisible(!isFavoriteModalVisible);
   };
 
   const getAPI = () => {
@@ -62,14 +66,12 @@ export default function TrangChu({ navigation }) {
       >
         <Text style={styles.addToCartButtonText}>{item.id === 'no_result' ? 'Không phù hợp' : 'Add to Cart'}</Text>
       </TouchableOpacity>
-      <Modal isVisible={isModalVisible}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>Sản phẩm đã được thêm vào giỏ hàng</Text>
-          <TouchableOpacity onPress={toggleModal}>
-            <Text style={styles.closeModalText}>Đóng</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <TouchableOpacity
+        style={styles.addToFavoriteButton}
+        onPress={() => handleAddToFavorite(item)}
+      >
+        <Text style={styles.addToFavoriteButtonText}>Yêu thích</Text>
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 
@@ -92,7 +94,29 @@ export default function TrangChu({ navigation }) {
     } else {
       setCartItems((prevItems) => [...prevItems, { ...item, quantity: 1 }]);
     }
-    toggleModal();
+
+    // Hiển thị modal cho giỏ hàng
+    toggleCartModal();
+  };
+
+  const handleAddToFavorite = async (item) => {
+    try {
+      const favoriteItemsString = await AsyncStorage.getItem('favoriteItems');
+      const parsedFavoriteItems = favoriteItemsString ? JSON.parse(favoriteItemsString) : [];
+
+      const isItemExist = parsedFavoriteItems.some((favoriteItem) => favoriteItem.id === item.id);
+
+      if (!isItemExist) {
+        parsedFavoriteItems.push(item);
+        await AsyncStorage.setItem('favoriteItems', JSON.stringify(parsedFavoriteItems));
+        // Hiển thị modal cho danh sách yêu thích
+        toggleFavoriteModal();
+      } else {
+        alert('Sản phẩm đã có trong danh sách yêu thích.');
+      }
+    } catch (error) {
+      console.error('Lỗi khi thêm vào danh sách yêu thích:', error);
+    }
   };
 
   const handlePressCart = () => {
@@ -112,9 +136,7 @@ export default function TrangChu({ navigation }) {
   };
 
   return (
-    
     <View style={styles.trangchu}>
-       
       <Header onPressCart={handlePressCart} onSearch={(searchText) => handleSearch(searchText)} />
       <TextInput
         style={styles.searchInput}
@@ -136,8 +158,28 @@ export default function TrangChu({ navigation }) {
         keyExtractor={(item) => item.id.toString()}
         scrollEnabled={true}
       />
-            <Footer navigation={navigation}  />
 
+      {/* Modal cho giỏ hàng */}
+      <Modal isVisible={isCartModalVisible}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>Sản phẩm đã được thêm vào giỏ hàng</Text>
+          <TouchableOpacity onPress={toggleCartModal}>
+            <Text style={styles.closeModalText}>Đóng</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Modal cho danh sách yêu thích */}
+      <Modal isVisible={isFavoriteModalVisible}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>Sản phẩm đã được thêm vào danh sách yêu thích</Text>
+          <TouchableOpacity onPress={toggleFavoriteModal}>
+            <Text style={styles.closeModalText}>Đóng</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Footer navigation={navigation} />
     </View>
   );
 }
@@ -176,9 +218,19 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderWidth: 1,
     marginRight: 5,
-    color:"#505050",
+    color: "#505050",
     backgroundColor: 'pink',
     borderColor: 'pink',
+  },
+  addToFavoriteButton: {
+    marginTop: 5,
+    padding: 5,
+    borderWidth: 1,
+    borderColor: 'blue',
+    borderRadius: 5,
+  },
+  addToFavoriteButtonText: {
+    color: 'blue',
   },
   itemTextPrice: {
     color: 'green',
